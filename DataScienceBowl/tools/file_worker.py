@@ -28,8 +28,7 @@ def check_format_support(path):
 def determine_format(path):
     path = str(path)
     path = os.path.splitext(path)
-    extension = path[1][1:]
-    return
+    return path[1][1:]
 
 
 def read_data(files, input_path):
@@ -38,7 +37,6 @@ def read_data(files, input_path):
     for file in files:
         df = fw.read_df(os.path.join(input_path, file))
         data_dict.update({file: df})
-    print(data_dict)
     return data_dict
 
 
