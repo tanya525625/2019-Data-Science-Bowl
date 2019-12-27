@@ -1,12 +1,12 @@
 import os
 
-from tools.quadratic_metric_kappa import quadratic_kappa
+# from tools.quadratic_metric_kappa import quadratic_kappa
 from tools.file_worker import read_data
 from tools.null_processing import drop_nones
 
 
 def make_forecast(data: dict):
-    train_dataset = drop_nones(data)
+    drop_nones(data)
 
     # write dataset if it's necessary
     # fw = FileWorker()

@@ -27,7 +27,7 @@ def quadratic_kappa(input_path, output_path, actuals_name, preds_name, N=4):
         actuals.append(actuals_list[i][1])
         preds.append(preds_list[i][1])
 
-    O = confusion_matrix(actuals, preds, labels=np.arange(N))
+    matrix_o = confusion_matrix(actuals, preds, labels=np.arange(N))
 
     for i in range(len(w)):
         for j in range(len(w)):
@@ -44,13 +44,13 @@ def quadratic_kappa(input_path, output_path, actuals_name, preds_name, N=4):
     E = np.outer(act_hist, pred_hist)
 
     E = E / E.sum()
-    O = O / O.sum()
+    matrix_o = matrix_o / matrix_o.sum()
 
     num = 0
     den = 0
     for i in range(len(w)):
         for j in range(len(w)):
-            num += w[i][j] * O[i][j]
+            num += w[i][j] * matrix_o[i][j]
             den += w[i][j] * E[i][j]
 
     return (1 - (num / den)) / 2 + 0.5

@@ -19,9 +19,9 @@ def drop_nones(data: dict):
     ] = False
 
     # finding mean value of not_launched games by installation_id
-    train_aggs = (
-        train_df.groupby("installation_id").agg({"not_launched": "mean"}).reset_index()
-    )
+    train_aggs = train_df.groupby("installation_id").\
+        agg({"not_launched": "mean"})
+    train_aggs = train_aggs.reset_index()
 
     # finding mean value of accuracy_group by installation_id
     train_labels_df = (
