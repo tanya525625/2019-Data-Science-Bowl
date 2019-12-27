@@ -1,7 +1,7 @@
 import os
-from tools.quadratic_metric_kappa import quadratic_kappa
+
+from tools.quadratic_metric_kappa import quadratic_kappa, list_of_class_values
 from tools.file_worker import read_data
-from tools.extract_list_of_class_values import list_of_class_values
 
 
 def make_forecast(data):
@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     actuals_path = os.path.join(input_path, "sample_submission.csv")
     preds_path = os.path.join(output_path, "predictions.csv")
-    
+
     files = ("sample_submission.csv", "test.csv", "train.csv", "train_labels.csv")
     data = read_data(files, input_path)
 
