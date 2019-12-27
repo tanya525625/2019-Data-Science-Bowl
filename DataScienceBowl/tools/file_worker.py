@@ -38,5 +38,3 @@ def read_data(files, input_path):
         df = fw.read_df(os.path.join(input_path, file))
         data_dict.update({file: df})
     return data_dict
-
-
