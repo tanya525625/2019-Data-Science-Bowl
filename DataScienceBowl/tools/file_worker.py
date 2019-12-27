@@ -3,12 +3,30 @@ import os
 
 
 class FileWorker:
+    """ Class for working with files """
+
     @staticmethod
-    def read_df(input_path, extension="csv"):
+    def read_df(input_path: str, extension="csv"):
+        """
+        Method for reading dataframes from files
+
+        :param input_path: path to the file
+        :param extension: extension of the file, csv by default
+        :return: pd.DataFrame, which was read
+        """
+
         return getattr(pd, f"read_{extension}")(input_path)
 
     @staticmethod
-    def write_df(df, extension, output_path):
+    def write_df(df: pd.DataFrame, output_path: str, extension="csv"):
+        """
+        Method for writing dataframe
+
+        :param df: dataframe for writing
+        :param output_path: path to the file
+        :param extension: extension of the file
+        """
+
         if check_format_support(output_path):
             getattr(df, f"to_{extension}")(output_path)
 
@@ -25,18 +43,32 @@ def check_format_support(path):
     return extension in supported_formats
 
 
-def determine_format(path):
-    path = str(path)
+def determine_format(path: str):
+    """
+    Function for determining extension of the file in path
+
+    :param path: path to the file
+    :return: extension of the file
+    """
+
     path = os.path.splitext(path)
     return path[1][1:]
 
 
 def read_data(files, input_path):
+    """
+    Function for reading datasets from files
+    All datasets can be received by dereferencing of the dictionary,
+    e.g. data_dict['name_of_the_file']
+
+    :param files: list with files names
+    :param input_path: path to the files
+    :return: dict with dataframes from files
+    """
+
     fw = FileWorker()
     data_dict = {}
     for file in files:
         df = fw.read_df(os.path.join(input_path, file))
         data_dict.update({file: df})
     return data_dict
-
-
