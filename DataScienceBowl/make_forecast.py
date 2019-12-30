@@ -1,17 +1,31 @@
 import os
 
+from sklearn.neighbors import KNeighborsClassifier
+
 from tools.quadratic_metric_kappa import quadratic_kappa
 from tools.quadratic_metric_kappa import list_of_class_values_from_file
 from tools.file_worker import read_data
 from tools.null_processing import drop_nones
+from tools.make_model import ModelMaker
 
 
 def make_forecast(data: dict):
-    drop_nones(data)
+    train_dataset = drop_nones(data)
 
     # write dataset if it's necessary
-    # fw = FileWorker()
     # fw.write_df(train_dataset, "new_train.csv")
+
+    hyperparams = {
+        "n_neighbors": 5,
+        "weights": "uniform",
+        "algorithm": "auto",
+        "leaf_size": 30,
+        "p": 2,
+        "metric": "minkowski",
+    }
+
+    model = ModelMaker(KNeighborsClassifier, hyperparams, train_dataset)
+    model.predict()
 
 
 if __name__ == "__main__":
