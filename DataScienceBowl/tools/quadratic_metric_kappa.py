@@ -27,11 +27,11 @@ def quadratic_kappa(actuals, preds, N=4):
 
     act_hist = np.zeros(N)
     for item in actuals:
-        act_hist[item] += 1
+        act_hist[int(item)] += 1
 
     pred_hist = np.zeros(N)
     for item in preds:
-        pred_hist[item] += 1
+        pred_hist[int(item)] += 1
 
     matrix_e = np.outer(act_hist, pred_hist)
 
