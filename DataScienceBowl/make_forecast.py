@@ -6,6 +6,7 @@ from tools.quadratic_metric_kappa import quadratic_kappa
 from tools.quadratic_metric_kappa import list_of_class_values_from_file
 from tools.file_worker import read_data
 from tools.null_processing import drop_nones
+from tools.file_worker import write_submission
 from tools.make_model import ModelMaker
 
 
@@ -25,7 +26,8 @@ def make_forecast(data: dict):
     }
 
     model = ModelMaker(KNeighborsClassifier, hyperparams, train_dataset)
-    model.predict()
+    prediction = model.predict()
+    write_submission(model.test_ist_ids, prediction)
 
 
 if __name__ == "__main__":
