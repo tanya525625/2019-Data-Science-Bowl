@@ -27,7 +27,7 @@ def make_forecast(data: dict):
 
     model = ModelMaker(KNeighborsClassifier, hyperparams, train_dataset)
     prediction = model.predict()
-    write_submission(model.test_ist_ids, prediction)
+    write_submission(model.test_ist_ids, prediction, "submission.csv")
 
 
 if __name__ == "__main__":

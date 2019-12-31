@@ -74,8 +74,7 @@ def read_data(files, input_path):
     return data_dict
 
 
-def write_submission(inst_ids: list, prediction: list):
+def write_submission(inst_ids: list, prediction: list, path_to_file: str):
     df = pd.DataFrame(prediction, index=inst_ids)
     fw = FileWorker()
-    fw.write_df(df, "submission.csv")
-
+    fw.write_df(df, path_to_file)

@@ -18,8 +18,8 @@ class ModelMaker:
         :param dataset: dataset, which divides to train and test
         """
 
-        self.x_train, self.x_test, self.y_train, self.y_test, self.test_ist_ids = \
-            prepare_train_and_test(dataset)
+        self.x_train, self.x_test, self.y_train, self.y_test, \
+            self.test_ist_ids = prepare_train_and_test(dataset)
         self.model = model_alg(**hyperparams)
         self.model.fit(self.x_train, self.y_train)
 
