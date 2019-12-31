@@ -12,7 +12,7 @@ def drop_nones(data: dict):
 
     train_df = if_game_was_launched(train_df)
     train_aggs = find_mean_of_not_launched_games(train_df)
-    train_labels_df = find_mean_of_accuracy_group(train_labels_df)
+    # train_labels_df = find_mean_of_accuracy_group(train_labels_df)
     train_aggs = merge_dataframes(train_aggs, train_labels_df)
     train_aggs.dropna(inplace=True)
 
@@ -30,8 +30,8 @@ def if_game_was_launched(df):
     df["not_launched"] = True
     # if in the dataset there is information about launching
     df.loc[
-        df["event_data"].str.contains("false")
-        & df["event_code"].isin([4100, 4110]),
+        df["event_data"].str.contains("false") &
+        df["event_code"].isin([4100, 4110]),
         "not_launched",
     ] = False
 
@@ -46,8 +46,7 @@ def find_mean_of_not_launched_games(df):
     :return: new dataframe
     """
 
-    df = df.groupby("installation_id").\
-        agg({"not_launched": "mean"})
+    df = df.groupby("installation_id").agg({"not_launched": "mean"})
     df = df.reset_index()
     return df
 
@@ -60,11 +59,8 @@ def find_mean_of_accuracy_group(df):
     :return:
     """
 
-    df = (
-        df.groupby("installation_id")
-        .agg({"accuracy_group": "mean"})
-        .reset_index()
-    )
+    df = df.groupby("installation_id").\
+        agg({"accuracy_group": "mean"}).reset_index()
     return df
 
 
@@ -77,6 +73,4 @@ def merge_dataframes(df1, df2):
     :return: merged dataframes
     """
 
-    return df1.merge(
-        df2[["installation_id", "accuracy_group"]], how="left"
-    )
+    return df1.merge(df2[["installation_id", "accuracy_group"]], how="left")

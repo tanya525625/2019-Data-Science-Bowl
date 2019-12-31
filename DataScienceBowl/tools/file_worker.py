@@ -72,3 +72,9 @@ def read_data(files, input_path):
         df = fw.read_df(os.path.join(input_path, file))
         data_dict.update({file: df})
     return data_dict
+
+
+def write_submission(inst_ids: list, prediction: list, path_to_file: str):
+    df = pd.DataFrame(prediction, index=inst_ids)
+    fw = FileWorker()
+    fw.write_df(df, path_to_file)
