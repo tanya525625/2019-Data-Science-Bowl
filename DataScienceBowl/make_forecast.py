@@ -39,8 +39,8 @@ def make_forecast(data_path: str, data_files: list):
 
 
 if __name__ == "__main__":
-    input_path = os.path.join("..", "Data")
-    output_path = os.path.join("..", "Prediction")
+    input_path = os.path.join("./", "Data")
+    output_path = os.path.join(".", "Prediction")
 
     actuals_path = os.path.join(input_path, "sample_submission.csv")
     preds_path = os.path.join(output_path, "predictions.csv")
