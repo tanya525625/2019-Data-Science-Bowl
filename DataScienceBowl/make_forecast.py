@@ -4,12 +4,13 @@ from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
 
 from tools.quadratic_metric_kappa import quadratic_kappa
-from tools.quadratic_metric_kappa import list_of_class_values_from_file
+from tools.quadratic_metric_kappa import list_of_class_values_from_df
 from tools.file_worker import read_data, FileWorker
 from tools.null_processing import drop_nones
 from tools.file_worker import write_submission
 from tools.make_model import ModelMaker
 from tools.prepare_data import missing_values_table
+from tools.prepare_data import prepare_data
 
 
 def make_forecast(data: dict):
@@ -27,7 +28,12 @@ def make_forecast(data: dict):
         "metric": "minkowski",
     }
     fw = FileWorker
-    train_dataset = fw.read_df("new_train.csv")
+    # train_dataset = fw.read_df("new_train.csv")
+    
+    train=pd.read_csv('../Data/train.csv')
+    train_labels=pd.read_csv('../Data/train_labels.csv')
+    train_dataset=prepare_data(train, train_labels)
+
     model = ModelMaker(KNeighborsClassifier, hyperparams, train_dataset)
     prediction = model.predict()
     write_submission(model.test_ist_ids, prediction, "submission.csv")
@@ -45,14 +51,8 @@ if __name__ == "__main__":
     # files = ("sample_submission.csv", "test.csv",
     #          "train.csv", "train_labels.csv")
     # data = read_data(files, input_path)
-
-    # data = {}
-    # make_forecast(data)
-
-    df = pd.read_csv("../Data/train.csv")
-    mis_columns = missing_values_table(df)
-
-    print(mis_columns)
+    data = {}
+    make_forecast(data)
 
     #
     # actuals = list_of_class_values_from_file(actuals_path)
