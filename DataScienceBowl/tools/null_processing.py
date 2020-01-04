@@ -1,3 +1,28 @@
+from tools.file_worker import read_data, FileWorker
+from os import path
+
+
+def cacheable_drop_nones(data_path, data_files):
+    '''
+    Function for dropping nones (information about games,
+    which were not launched) with storing results in
+    file 'new_train.csv' in data_path directory
+
+    :param data_path: path to data directory
+    :param data_files: list of files of data
+    :return: new train dataset (pd.DataFrame)
+    '''
+    fw = FileWorker
+    cache_path = path.join(data_path, 'new_train.csv')
+    if path.exists(cache_path):
+        train_dataset = fw.read_df(cache_path)
+    else:
+        data = read_data(data_files, data_path)
+        train_dataset = drop_nones(data)
+        fw.write_df(train_dataset, cache_path)
+    return train_dataset
+
+
 def drop_nones(data: dict):
     """
     Function for dropping nones (information about games,
