@@ -4,9 +4,10 @@ import os
 from tools.file_worker import read_data
 from tools.null_processing import cacheable_drop_nones
 from tools.quadratic_metric_kappa import quadratic_kappa
-from tools.make_model import ModelMaker
-from sklearn.neighbors import KNeighborsClassifier
+from tools.make_model import ModelMaker,  prepare_train_and_test
+from tools.prepare_data import cacheable_prepare_data
 
+from sklearn.neighbors import KNeighborsClassifier
 import pandas
 import numpy
 from sklearn.feature_selection import SelectKBest
@@ -26,12 +27,21 @@ def find_well_hyperparams(data_path: str, data_files: list,
                                   and sets of params to be tried
         :return: hyperparams that have the best score and their score
     """
-    dataset = cacheable_drop_nones(data_path, data_files)
+    dataset = _prepare_dataset(data_path, data_files)
     hyperparams = _get_min_from_range(hyperparams_range)
     hyperparams_sets = _transform_range_to_set(hyperparams_range)
     hyperparams_range = None
     best_result = _find_best_params(dataset, hyperparams, hyperparams_sets)
     return best_result
+
+
+def _prepare_dataset(data_path, data_files):
+    dataset = cacheable_prepare_data(data_path, data_files)
+    x_train, x_test, y_train, y_test, test_ist_ids =\
+        prepare_train_and_test(dataset)
+    dataset = {'x_train': x_train, 'y_train': y_train,
+               'x_test': x_test, 'y_test': y_test}
+    return dataset
 
 
 def _transform_range_to_set(hyperparams_range):
@@ -110,7 +120,7 @@ def _recursive_finding(dataset, hyperparams, hyperparams_sets,
                            result, index + 1)
 
 
-def _try_params(hyperparams, train_dataset):
+def _try_params(hyperparams, dataset):
     '''
     Method to make model by given hyperparams and evaluate it by
     quadratic_kappa
@@ -120,10 +130,13 @@ def _try_params(hyperparams, train_dataset):
     '''
     params = hyperparams.copy()
     del params['model_type']
+
     model = ModelMaker(hyperparams['model_type'][0], params,
-                       train_dataset)
+                       dataset['x_train'],
+                       dataset['y_train'],
+                       dataset['x_test'])
     prediction = model.predict()
-    return quadratic_kappa(model.y_test, prediction, 4)
+    return quadratic_kappa(dataset['y_test'], prediction, 4)
 
 
 def get_hyperparams_range():
