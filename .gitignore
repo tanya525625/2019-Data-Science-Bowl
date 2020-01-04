@@ -130,3 +130,4 @@ dmypy.json
 
 ./DataScienceBowl/data
 .vscode
+submission.csv
