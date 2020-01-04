@@ -150,4 +150,4 @@ if __name__ == '__main__':
              "train.csv", "train_labels.csv"]
     hyperparams_ranges = get_hyperparams_range()
     well_params = find_well_hyperparams(input_path, files, hyperparams_ranges)
-    print(well_params['value'])
+    print(well_params['hyperparams'])

@@ -40,5 +40,7 @@ def prepare_data(train, train_labels):
     
     train = train.merge(train_labels[["game_session", 'installation_id', "accuracy_group"]])
     train = train.dropna()
+    print(train)
+    train=train.drop('event_id',axis=1)
 
     return train

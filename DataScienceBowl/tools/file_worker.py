@@ -15,7 +15,7 @@ class FileWorker:
         :return: pd.DataFrame, which was read
         """
 
-        return getattr(pd, f"read_{extension}")(input_path, nrows=10000)
+        return getattr(pd, f"read_{extension}")(input_path)
 
     @staticmethod
     def write_df(df: pd.DataFrame, output_path: str, extension="csv"):
@@ -77,5 +77,6 @@ def read_data(files, input_path):
 def write_submission(inst_ids: list, prediction: list, path_to_file: str):
     df = pd.DataFrame(prediction, index=inst_ids)
     df.columns = ["accuracy_group"]
+    df = df.groupby(['installation_id']).agg(lambda x:x.value_counts().index[0])
     fw = FileWorker()
     fw.write_df(df, path_to_file)

@@ -42,7 +42,8 @@ def prepare_train_and_test(dataset):
     """
 
     y = dataset['accuracy_group']
-    X = dataset['installation_id']
+    # X = dataset['installation_id']
+    X = dataset.drop('accuracy_group', axis = 1)
     y.columns = ['accuracy_group']
     x_train, x_test, y_train, y_test =\
         train_test_split(X, y, test_size=0.33, random_state=42)
@@ -55,7 +56,8 @@ def prepare_train_and_test(dataset):
     x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
     x_test_hash = make_number_hashes_for_list(x_test.values).reshape(-1, 1)
 
-    return x_train, x_test_hash, y_train, y_test, x_test
+    # return x_train, x_test_hash, y_train, y_test, x_test
+    return x_train, x_test_hash, y_train, y_test, x_test['installation_id']
 
 
 def remove_duplicate_values_in_test(x, y):
