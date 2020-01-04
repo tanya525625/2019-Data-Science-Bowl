@@ -144,7 +144,7 @@ def get_hyperparams_range():
 
 
 if __name__ == '__main__':
-    input_path = "./Data"
+    input_path = "../Data"
     output_path = os.path.join("..", "Prediction")
     files = ["sample_submission.csv", "test.csv",
              "train.csv", "train_labels.csv"]
