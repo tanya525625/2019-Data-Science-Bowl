@@ -5,54 +5,46 @@ import pandas as pd
 
 from tools.quadratic_metric_kappa import quadratic_kappa
 from tools.quadratic_metric_kappa import list_of_class_values_from_df
-from tools.file_worker import read_data, FileWorker
-from tools.null_processing import cacheable_drop_nones
+from tools.file_worker import read_data
 from tools.file_worker import write_submission
 from tools.make_model import ModelMaker
-from tools.prepare_data import missing_values_table
 from tools.prepare_data import prepare_data
+from tools.make_model import prepare_hash_train_and_test_kaggle
+from tools.make_model import prepare_train_and_test
 
 
-def make_forecast(data_path: str, data_files: list):
-    fw = FileWorker
-    train_dataset = cacheable_drop_nones(data_path, data_files)
+def make_forecast(train, train_labels, test):
     hyperparams = {
-        "n_neighbors": 5,
-        "weights": "uniform",
-        "algorithm": "auto",
-        "leaf_size": 30,
-        "p": 2,
-        "metric": "minkowski",
+        'n_neighbors': 7,
+        'weights': 'uniform',
+        'algorithm': 'auto',
+        'leaf_size': 10,
+        'p': 2,
+        'metric': 'minkowski'
     }
-    fw = FileWorker
-    # train_dataset = fw.read_df("new_train.csv")
-    
-    train=pd.read_csv('../Data/train.csv')
-    train_labels=pd.read_csv('../Data/train_labels.csv')
-    train_dataset=prepare_data(train, train_labels)
 
-    model = ModelMaker(KNeighborsClassifier, hyperparams, train_dataset)
+    train_dataset = prepare_data(train, train_labels)
+
+    x_train, x_test, y_train, y_test, test_ist_ids = prepare_train_and_test(train_dataset)
+
+    model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test)
     prediction = model.predict()
-    write_submission(model.test_ist_ids, prediction, "submission.csv")
-    print(quadratic_kappa(model.y_test, prediction, 4))
+    write_submission(test_ist_ids, prediction, "submission.csv")
+
+    # x_train, x_test_hash, y_train, test = prepare_hash_train_and_test_kaggle(train_dataset, test)
+    
+    # model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
+    # prediction = model.predict()
+    # write_submission(test['installation_id'], prediction, "submission.csv")
+    print(quadratic_kappa(y_test, prediction, 4))
     return prediction
 
 
 if __name__ == "__main__":
     input_path = os.path.join("..", "Data")
     output_path = os.path.join("..", "Prediction")
+    files = ["train.csv", "train_labels.csv", "test.csv"]
 
-    actuals_path = os.path.join(input_path, "sample_submission.csv")
-    preds_path = os.path.join(output_path, "predictions.csv")
+    data = read_data(files, input_path)
 
-    files = ["sample_submission.csv", "test.csv",
-             "train.csv", "train_labels.csv"]
-    # data = read_data(files, input_path)
-    # data['train.csv'] = data['train_part.csv']
-    # data['train_part.csv'] = None
-    make_forecast(input_path, files)
-    #
-    # actuals = list_of_class_values_from_file(actuals_path)
-    # preds = list_of_class_values_from_file(preds_path)
-    #
-    # evaluation = quadratic_kappa(actuals, preds, 4)
+    make_forecast(data["train.csv"], data["train_labels.csv"], data["test.csv"])

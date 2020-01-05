@@ -8,7 +8,7 @@ from tools.null_processing import find_mean_of_accuracy_group
 class ModelMaker:
     """ Class for making models """
 
-    def __init__(self, model_alg, hyperparams, dataset):
+    def __init__(self, model_alg, hyperparams, x_train, y_train, x_test):
         """
         ModelMaker constructor (can take any model_alg
         and corresponding hyperparameters)
@@ -18,8 +18,12 @@ class ModelMaker:
         :param dataset: dataset, which divides to train and test
         """
 
-        self.x_train, self.x_test, self.y_train, self.y_test, \
-            self.test_ist_ids = prepare_train_and_test(dataset)
+        # self.x_train, self.x_test, self.y_train, self.y_test, \
+        #    self.test_ist_ids = prepare_train_and_test(train, test)
+        self.x_train = x_train
+        self.y_train = y_train
+        self.x_test = x_test
+
         self.model = model_alg(**hyperparams)
         self.model.fit(self.x_train, self.y_train)
 
@@ -37,16 +41,23 @@ def prepare_train_and_test(dataset):
     :return: train and test datasets
     """
 
-    x_train = dataset["installation_id"]
-    y_train = dataset["accuracy_group"]
-    x_train, x_test, y_train, y_test = train_test_split(
-        x_train, y_train, test_size=0.33, random_state=42
-    )
-    x_test, y_test = remove_duplicate_values_in_test(x_test, y_test)
-    x_train = make_number_hashes_for_list(x_train.tolist()).reshape(-1, 1)
-    x_test_hash = make_number_hashes_for_list(x_test.tolist()).reshape(-1, 1)
+    y = dataset['accuracy_group']
+    # X = dataset['installation_id']
+    X = dataset.drop('accuracy_group', axis = 1)
+    y.columns = ['accuracy_group']
+    x_train, x_test, y_train, y_test =\
+        train_test_split(X, y, test_size=0.33, random_state=42)
+    # x_train = train.loc[:, train.columns != 'accuracy_group']
+    # y_train = train['accuracy_group']
+    # x_test = test.loc[:, test.columns != 'accuracy_group']
+    # y_test = test['accuracy_group']
 
-    return x_train, x_test_hash, y_train, y_test, x_test
+    # x_test, y_test = remove_duplicate_values_in_test(x_test, y_test)
+    x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
+    x_test_hash = make_number_hashes_for_list(x_test.values).reshape(-1, 1)
+
+    # return x_train, x_test_hash, y_train, y_test, x_test
+    return x_train, x_test_hash, y_train, y_test, x_test['installation_id']
 
 
 def remove_duplicate_values_in_test(x, y):
@@ -63,4 +74,21 @@ def remove_duplicate_values_in_test(x, y):
     df.columns = ["accuracy_group"]
     df = find_mean_of_accuracy_group(df)
     df["accuracy_group"] = df.accuracy_group.apply(int)
+
     return df["installation_id"], df["accuracy_group"]
+
+
+def prepare_hash_train_and_test_kaggle(train_dataset, test):
+    """
+    Function for splitting dataset
+    to train and test datasets
+
+    :param dataset: dataset for splitting
+    :return: train and test datasets
+    """
+    y_train = train_dataset["accuracy_group"]
+    x_train = train_dataset.drop("accuracy_group", axis=1)
+    x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
+    x_test_hash = make_number_hashes_for_list(test.values).reshape(-1, 1)
+
+    return x_train, x_test_hash, y_train, test
