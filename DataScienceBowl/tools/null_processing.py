@@ -83,8 +83,8 @@ def find_mean_of_accuracy_group(df):
     :param df: dataframe for investigation
     :return:
     """
-
-    df = df.groupby("installation_id").\
+    df = df.reset_index()
+    df = df.groupby("index").\
         agg({"accuracy_group": "mean"}).reset_index()
     return df
 

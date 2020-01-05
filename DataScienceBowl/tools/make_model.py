@@ -43,21 +43,17 @@ def prepare_train_and_test(dataset):
 
     y = dataset['accuracy_group']
     # X = dataset['installation_id']
-    X = dataset.drop('accuracy_group', axis = 1)
+    X = dataset.drop('accuracy_group', axis=1)
     y.columns = ['accuracy_group']
     x_train, x_test, y_train, y_test =\
         train_test_split(X, y, test_size=0.33, random_state=42)
-    # x_train = train.loc[:, train.columns != 'accuracy_group']
-    # y_train = train['accuracy_group']
-    # x_test = test.loc[:, test.columns != 'accuracy_group']
-    # y_test = test['accuracy_group']
 
-    # x_test, y_test = remove_duplicate_values_in_test(x_test, y_test)
+    # x_test, y_test, x_test_ids = remove_duplicate_values_in_test(x_test, y_test)
     x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
     x_test_hash = make_number_hashes_for_list(x_test.values).reshape(-1, 1)
 
     # return x_train, x_test_hash, y_train, y_test, x_test
-    return x_train, x_test_hash, y_train, y_test, x_test['installation_id']
+    return x_train, x_test_hash, y_train, y_test, x_test
 
 
 def remove_duplicate_values_in_test(x, y):
@@ -70,12 +66,12 @@ def remove_duplicate_values_in_test(x, y):
     :return: x_test, y_test
     """
 
+    x_test_ids = x["installation_id"].drop_duplicates()
     df = pd.DataFrame(list(y), index=x)
     df.columns = ["accuracy_group"]
     df = find_mean_of_accuracy_group(df)
     df["accuracy_group"] = df.accuracy_group.apply(int)
-
-    return df["installation_id"], df["accuracy_group"]
+    return df.index, df["accuracy_group"], x_test_ids
 
 
 def prepare_hash_train_and_test_kaggle(train_dataset, test):
@@ -88,7 +84,14 @@ def prepare_hash_train_and_test_kaggle(train_dataset, test):
     """
     y_train = train_dataset["accuracy_group"]
     x_train = train_dataset.drop("accuracy_group", axis=1)
+
+    # Temporary version
+    test = test["installation_id"]
+    test.columns = ["installation_id"]
+
+    test = test.drop_duplicates()
     x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
     x_test_hash = make_number_hashes_for_list(test.values).reshape(-1, 1)
 
     return x_train, x_test_hash, y_train, test
+

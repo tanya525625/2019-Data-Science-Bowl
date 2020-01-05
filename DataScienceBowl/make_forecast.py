@@ -1,10 +1,8 @@
 import os
 
 from sklearn.neighbors import KNeighborsClassifier
-import pandas as pd
 
 from tools.quadratic_metric_kappa import quadratic_kappa
-from tools.quadratic_metric_kappa import list_of_class_values_from_df
 from tools.file_worker import read_data
 from tools.file_worker import write_submission
 from tools.make_model import ModelMaker
@@ -27,15 +25,11 @@ def make_forecast(train, train_labels, test):
 
     x_train, x_test, y_train, y_test, test_ist_ids = prepare_train_and_test(train_dataset)
 
+    # x_train, x_test_hash, y_train, test = prepare_hash_train_and_test_kaggle(train_dataset, test)
+
     model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test)
     prediction = model.predict()
-    write_submission(test_ist_ids, prediction, "submission.csv")
-
-    # x_train, x_test_hash, y_train, test = prepare_hash_train_and_test_kaggle(train_dataset, test)
-    
-    # model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
-    # prediction = model.predict()
-    # write_submission(test['installation_id'], prediction, "submission.csv")
+    write_submission(test_ist_ids["installation_id"], prediction, "submission.csv")
     print(quadratic_kappa(y_test, prediction, 4))
     return prediction
 
