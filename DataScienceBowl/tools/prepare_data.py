@@ -1,6 +1,11 @@
-import pandas as pd
-from tools.file_worker import read_data, FileWorker
 from os import path
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import MinMaxScaler
+
+from tools.file_worker import read_data, FileWorker
 
 
 def missing_values_table(df):
@@ -38,7 +43,7 @@ def missing_values_table(df):
     return mis_val_table_ren_columns
 
 
-def prepare_data(train, train_labels):
+def prepare_train_data(train, train_labels):
     '''
     Shape DataFrame for prediction function
     '''
@@ -48,9 +53,45 @@ def prepare_data(train, train_labels):
                                       #"event_count",
                                       #"game_time", "type", "world"]])
     train = train.dropna()
-    train = train.drop('event_id', axis=1)
+    # train = train.drop('game_session', axis=1)
+
+    enc=LabelEncoder()
+    for col in list(train):
+        if (col == 'installation_id'):
+            pass
+        else:
+            train[col] = enc.fit_transform(train[col])
+
+    inst_id_list = train['installation_id'].tolist()
+    for i in range(len(inst_id_list)):
+        inst_id_list[i] = int(inst_id_list[i], 16)
+
+    train['installation_id'] = inst_id_list
 
     return train
+
+
+def prepare_test_data(test_dataset):
+    '''
+    Shape DataFrame for prediction function
+    '''
+
+    test_dataset = test_dataset.dropna()
+    
+    enc=LabelEncoder()
+    for col in list(test_dataset):
+        if (col == 'installation_id'):
+            pass
+        else:
+            test_dataset[col] = enc.fit_transform(test_dataset[col])
+
+    inst_id_list = test_dataset['installation_id'].tolist()
+    for i in range(len(inst_id_list)):
+        inst_id_list[i] = int(inst_id_list[i], 16)
+
+    test_dataset['installation_id'] = inst_id_list
+    
+    return test_dataset
 
 
 def cacheable_prepare_data(data_path, data_files):
@@ -69,7 +110,7 @@ def cacheable_prepare_data(data_path, data_files):
         train_dataset = fw.read_df(cache_path)
     else:
         data = read_data(data_files, data_path)
-        train_dataset = prepare_data(data['train.csv'],
+        train_dataset = prepare_train_data(data['train.csv'],
                                      data['train_labels.csv'])
         fw.write_df(train_dataset, cache_path)
     return train_dataset
