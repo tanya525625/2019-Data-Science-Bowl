@@ -30,6 +30,13 @@ def make_forecast(train, train_labels, test):
     model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test)
     prediction = model.predict()
     write_submission(test_ist_ids["installation_id"], prediction, "submission.csv")
+
+    # x_train, x_test_hash, y_train, test = prepare_hash_train_and_test_kaggle(train_dataset, test)
+
+    # model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
+    # prediction = model.predict()
+    # write_submission(test['installation_id'], prediction, "submission.csv")
+
     print(quadratic_kappa(y_test, prediction, 4))
     return prediction
 
