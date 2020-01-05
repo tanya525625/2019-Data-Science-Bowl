@@ -13,7 +13,7 @@ def quadratic_kappa(actuals, preds, N=4):
     :param preds: list of numbers(predicted object classes)
                   with values from 0 to N
     :return: evaluation for prediction with value from
-             0.0(absolutely wrong prediction) to
+             -1.0(absolutely wrong prediction) to
              1.0(absolutely correct prediction)
     """
 

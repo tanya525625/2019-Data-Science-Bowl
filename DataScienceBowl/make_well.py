@@ -12,6 +12,8 @@ import pandas
 import numpy
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
+import json
+import gc
 
 
 def find_well_hyperparams(data_path: str, data_files: list,
@@ -111,6 +113,7 @@ def _recursive_finding(dataset, hyperparams, hyperparams_sets,
         if (value > result['value']):
             result['value'] = value
             result['hyperparams'] = hyperparams.copy()
+            print(value)
         return
     key = keys[index]
     n = len(hyperparams_sets[key])
@@ -136,6 +139,9 @@ def _try_params(hyperparams, dataset):
                        dataset['y_train'],
                        dataset['x_test'])
     prediction = model.predict()
+    del model
+    del params
+    gc.collect()
     return quadratic_kappa(dataset['y_test'], prediction, 4)
 
 
@@ -164,3 +170,9 @@ if __name__ == '__main__':
     hyperparams_ranges = get_hyperparams_range()
     well_params = find_well_hyperparams(input_path, files, hyperparams_ranges)
     print(well_params['hyperparams'])
+    print(well_params['value'])
+    del well_params['hyperparams']['model_type'][0]
+    str = json.dumps(well_params)
+    with open("well_params.json", 'wt') as f:
+        f.write(str)
+    
