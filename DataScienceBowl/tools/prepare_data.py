@@ -48,7 +48,6 @@ def prepare_data(train, train_labels):
                                       #"event_count",
                                       #"game_time", "type", "world"]])
     train = train.dropna()
-    print(train)
     train = train.drop('event_id', axis=1)
 
     return train

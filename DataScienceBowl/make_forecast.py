@@ -15,12 +15,12 @@ from tools.make_model import prepare_train_and_test
 
 def make_forecast(train, train_labels, test):
     hyperparams = {
-        "n_neighbors": 7,
-        "weights": "distance",
-        "algorithm": "auto",
-        "leaf_size": 15,
-        "p": 2,
-        "metric": "minkowski",
+        'n_neighbors': 7,
+        'weights': 'uniform',
+        'algorithm': 'auto',
+        'leaf_size': 10,
+        'p': 2,
+        'metric': 'minkowski'
     }
 
     train_dataset = prepare_data(train, train_labels)
