@@ -114,3 +114,32 @@ def cacheable_prepare_data(data_path, data_files):
                                      data['train_labels.csv'])
         fw.write_df(train_dataset, cache_path)
     return train_dataset
+
+def prepare_data(test_dataset, train_dataset, train_labels):
+    train_dataset = train_dataset.merge(train_labels[["game_session", 'installation_id',
+                                      "accuracy_group"]])
+    train_dataset = train_dataset.dropna()
+
+    common_dataset = pd.concat([train_dataset, test_dataset], sort=False)
+
+    train_length = len(train_dataset.index)
+
+    enc=LabelEncoder()
+    for col in list(common_dataset):
+        if (col == 'installation_id'):
+            pass
+        else:
+            common_dataset[col] = enc.fit_transform(common_dataset[col])
+
+    inst_id_list = common_dataset['installation_id'].tolist()
+    for i in range(len(inst_id_list)):
+        inst_id_list[i] = int(inst_id_list[i], 16)
+
+    common_dataset['installation_id'] = inst_id_list
+
+    test_dataset = common_dataset.iloc[train_length:]
+    train_dataset = common_dataset.iloc[:train_length]
+  
+    test_dataset = test_dataset.drop('accuracy_group', axis=1)
+
+    return test_dataset, train_dataset

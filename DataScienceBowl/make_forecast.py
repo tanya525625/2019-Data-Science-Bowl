@@ -10,34 +10,38 @@ from tools.prepare_data import prepare_train_data
 from tools.prepare_data import prepare_test_data
 from tools.make_model import prepare_hash_train_and_test_kaggle
 from tools.make_model import prepare_train_and_test
+from tools.prepare_data import prepare_data
 
 
 def make_forecast(train, train_labels, test_dataset):
     hyperparams = {
-        'n_neighbors': 7,
+        'n_neighbors': 3,
         'weights': 'uniform',
         'algorithm': 'auto',
-        'leaf_size': 10,
+        'leaf_size': 3,
         'p': 2,
         'metric': 'minkowski'
     }
 
-    train_dataset = prepare_train_data(train, train_labels)
-    test_dataset = prepare_test_data(test_dataset)
+    # train_dataset = prepare_train_data(train, train_labels)
+    # test_dataset = prepare_test_data(test_dataset)
 
-    x_train, x_test, y_train, y_test, test_ist_ids = prepare_train_and_test(train_dataset)
+    test_dataset, train_dataset = prepare_data(test_dataset, train, train_labels)
 
-    model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test)
-    prediction = model.predict()
-    write_submission(test_ist_ids["installation_id"].tolist(), prediction, "submission.csv")
-    
-    # x_train, x_test_hash, y_train, test_dataset_ids = prepare_hash_train_and_test_kaggle(train_dataset, test_dataset)
+    # x_train, x_test, y_train, y_test, test_ist_ids = prepare_train_and_test(train_dataset)
 
-    # model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
+    # model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test)
     # prediction = model.predict()
-    # write_submission(test_dataset_ids.tolist(), prediction, "submission.csv")
+    # write_submission(test_ist_ids["installation_id"].tolist(), prediction, "submission.csv")
 
-    print(quadratic_kappa(y_test, prediction, 4))
+    #print(quadratic_kappa(y_test, prediction, 4))
+    
+    x_train, x_test_hash, y_train, test_dataset_ids = prepare_hash_train_and_test_kaggle(train_dataset, test_dataset)
+
+    model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
+    prediction = model.predict()
+    write_submission(test_dataset_ids.tolist(), prediction, "submission.csv")
+
     return prediction
 
 
