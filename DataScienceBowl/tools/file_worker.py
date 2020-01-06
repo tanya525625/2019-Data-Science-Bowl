@@ -75,8 +75,19 @@ def read_data(files, input_path):
 
 
 def write_submission(inst_ids: list, prediction: list, path_to_file: str):
-    df = pd.DataFrame(prediction, index=inst_ids)
-    df.columns = ["accuracy_group"]
+    # max_ln = len(format(max(inst_ids), 'x'))
+    #
+    # for i in range(len(inst_ids)):
+    #     cur_id = format(inst_ids[i], 'x')
+    #     if(len(cur_id) < max_ln):
+    #         inst_ids[i] = '0'*(max_ln-len(cur_id)) + cur_id
+    #     else:
+    #         inst_ids[i] = cur_id
+
+    df = pd.DataFrame(list(zip(inst_ids, prediction)), 
+                      columns=['installation_id', 'accuracy_group'])
+
     df = df.groupby(['installation_id']).agg(lambda x:x.value_counts().index[0])
     fw = FileWorker()
+    
     fw.write_df(df, path_to_file)

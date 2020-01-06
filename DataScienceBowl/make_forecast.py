@@ -6,38 +6,44 @@ from tools.quadratic_metric_kappa import quadratic_kappa
 from tools.file_worker import read_data
 from tools.file_worker import write_submission
 from tools.make_model import ModelMaker
-from tools.prepare_data import prepare_data
+from tools.prepare_data import prepare_train_data
+from tools.prepare_data import prepare_test_data
 from tools.make_model import prepare_hash_train_and_test_kaggle
 from tools.make_model import prepare_train_and_test
+from tools.prepare_data import prepare_data, prepare_test_for_us
 
 
-def make_forecast(train, train_labels, test):
+def make_forecast(train, train_labels, test_dataset):
     hyperparams = {
-        'n_neighbors': 7,
+        'n_neighbors': 3,
         'weights': 'uniform',
         'algorithm': 'auto',
-        'leaf_size': 10,
+        'leaf_size': 3,
         'p': 2,
         'metric': 'minkowski'
     }
+    # train_dataset = prepare_train_data(train, train_labels)
+    # test_dataset = prepare_test_data(test_dataset)
 
-    train_dataset = prepare_data(train, train_labels)
+    isKaggle = False
+    test_dataset, train_dataset, test_inst_id_not_enc = prepare_data(test_dataset, train, train_labels, isKaggle)
 
-    x_train, x_test, y_train, y_test, test_ist_ids = prepare_train_and_test(train_dataset)
+    #if isKaggle == True: df["accuracy_group"] = NaN
+    if isKaggle:
+        test_dataset.drop("accuracy_group", inplace=True, axis=1)
 
-    # x_train, x_test_hash, y_train, test = prepare_hash_train_and_test_kaggle(train_dataset, test)
+    x_train, x_test_hash, y_train = prepare_hash_train_and_test_kaggle(train_dataset, test_dataset)
+    if not isKaggle:
+        real_value = x_test_hash["accuracy_group"]
+        x_test_hash = x_test_hash.drop("accuracy_group", axis=1)
 
-    model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test)
+    model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
     prediction = model.predict()
-    write_submission(test_ist_ids["installation_id"], prediction, "submission.csv")
+    # print(test_inst_id_not_enc)
+    write_submission(test_inst_id_not_enc, prediction, "submission.csv")
 
-    # x_train, x_test_hash, y_train, test = prepare_hash_train_and_test_kaggle(train_dataset, test)
-
-    # model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
-    # prediction = model.predict()
-    # write_submission(test['installation_id'], prediction, "submission.csv")
-
-    print(quadratic_kappa(y_test, prediction, 4))
+    if not isKaggle:
+        print(quadratic_kappa(real_value, prediction, 4))
     return prediction
 
 

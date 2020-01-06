@@ -18,8 +18,6 @@ class ModelMaker:
         :param dataset: dataset, which divides to train and test
         """
 
-        # self.x_train, self.x_test, self.y_train, self.y_test, \
-        #    self.test_ist_ids = prepare_train_and_test(train, test)
         self.x_train = x_train
         self.y_train = y_train
         self.x_test = x_test
@@ -49,11 +47,11 @@ def prepare_train_and_test(dataset):
         train_test_split(X, y, test_size=0.33, random_state=42)
 
     # x_test, y_test, x_test_ids = remove_duplicate_values_in_test(x_test, y_test)
-    x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
-    x_test_hash = make_number_hashes_for_list(x_test.values).reshape(-1, 1)
+    #x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
+    #x_test_hash = make_number_hashes_for_list(x_test.values).reshape(-1, 1)
 
     # return x_train, x_test_hash, y_train, y_test, x_test
-    return x_train, x_test_hash, y_train, y_test, x_test
+    return x_train, x_test, y_train, y_test, x_test
 
 
 def remove_duplicate_values_in_test(x, y):
@@ -74,7 +72,7 @@ def remove_duplicate_values_in_test(x, y):
     return df.index, df["accuracy_group"], x_test_ids
 
 
-def prepare_hash_train_and_test_kaggle(train_dataset, test):
+def prepare_hash_train_and_test_kaggle(train_dataset, test_dataset):
     """
     Function for splitting dataset
     to train and test datasets
@@ -82,16 +80,13 @@ def prepare_hash_train_and_test_kaggle(train_dataset, test):
     :param dataset: dataset for splitting
     :return: train and test datasets
     """
+    
     y_train = train_dataset["accuracy_group"]
     x_train = train_dataset.drop("accuracy_group", axis=1)
 
-    # Temporary version
-    test = test["installation_id"]
-    test.columns = ["installation_id"]
+    test_dataset = test_dataset.drop_duplicates()
+    #x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
+    #x_test_hash = make_number_hashes_for_list(test.values).reshape(-1, 1)
 
-    test = test.drop_duplicates()
-    x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
-    x_test_hash = make_number_hashes_for_list(test.values).reshape(-1, 1)
-
-    return x_train, x_test_hash, y_train, test
+    return x_train, test_dataset, y_train
 
