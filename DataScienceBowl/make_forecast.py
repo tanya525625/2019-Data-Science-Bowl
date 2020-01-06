@@ -28,7 +28,7 @@ def make_forecast(train, train_labels, test_dataset):
     isKaggle = False
     test_dataset, train_dataset, test_inst_id_not_enc = prepare_data(test_dataset, train, train_labels, isKaggle)
 
-    #if isKaggle df["accuracy_group"] = NaN
+    #if isKaggle==True: df["accuracy_group"] = NaN
     if isKaggle:
         test_dataset.drop("accuracy_group", inplace=True, axis=1)
 
@@ -39,6 +39,7 @@ def make_forecast(train, train_labels, test_dataset):
 
     model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
     prediction = model.predict()
+    # print(test_inst_id_not_enc)
     write_submission(test_inst_id_not_enc, prediction, "submission.csv")
 
     if not isKaggle:

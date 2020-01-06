@@ -15,7 +15,7 @@ class FileWorker:
         :return: pd.DataFrame, which was read
         """
 
-        return getattr(pd, f"read_{extension}")(input_path, nrows=10000)
+        return getattr(pd, f"read_{extension}")(input_path)
 
     @staticmethod
     def write_df(df: pd.DataFrame, output_path: str, extension="csv"):

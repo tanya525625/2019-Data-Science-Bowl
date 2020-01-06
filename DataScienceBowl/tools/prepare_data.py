@@ -147,7 +147,7 @@ def prepare_data(test_dataset, train_dataset, train_labels, isKaggle):
 
     if not isKaggle:
         x_train, x_test, y_train, y_test = prepare_test_for_us(train_dataset)
-        test_inst_id_not_enc = x_test
+        test_inst_id_not_enc = x_test['installation_id']
         test_dataset = pd.concat([x_test, y_test], sort=False, axis=1)
         train_dataset = pd.concat([x_train, y_train], sort=False, axis=1)
 
