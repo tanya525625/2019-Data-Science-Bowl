@@ -18,8 +18,6 @@ class ModelMaker:
         :param dataset: dataset, which divides to train and test
         """
 
-        # self.x_train, self.x_test, self.y_train, self.y_test, \
-        #    self.test_ist_ids = prepare_train_and_test(train, test)
         self.x_train = x_train
         self.y_train = y_train
         self.x_test = x_test
