@@ -86,13 +86,9 @@ def prepare_hash_train_and_test_kaggle(train_dataset, test_dataset):
     y_train = train_dataset["accuracy_group"]
     x_train = train_dataset.drop("accuracy_group", axis=1)
 
-    # Temporary version
-    test_dataset_ids = test_dataset["installation_id"]
-    test_dataset_ids.columns = ["installation_id"]
-
     test_dataset = test_dataset.drop_duplicates()
     #x_train = make_number_hashes_for_list(x_train.values).reshape(-1, 1)
     #x_test_hash = make_number_hashes_for_list(test.values).reshape(-1, 1)
 
-    return x_train, test_dataset, y_train, test_dataset_ids
+    return x_train, test_dataset, y_train
 

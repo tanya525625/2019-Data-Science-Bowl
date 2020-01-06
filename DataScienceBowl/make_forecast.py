@@ -10,7 +10,7 @@ from tools.prepare_data import prepare_train_data
 from tools.prepare_data import prepare_test_data
 from tools.make_model import prepare_hash_train_and_test_kaggle
 from tools.make_model import prepare_train_and_test
-from tools.prepare_data import prepare_data
+from tools.prepare_data import prepare_data, prepare_test_for_us
 
 
 def make_forecast(train, train_labels, test_dataset):
@@ -22,27 +22,28 @@ def make_forecast(train, train_labels, test_dataset):
         'p': 2,
         'metric': 'minkowski'
     }
-
     # train_dataset = prepare_train_data(train, train_labels)
     # test_dataset = prepare_test_data(test_dataset)
 
-    test_dataset, train_dataset = prepare_data(test_dataset, train, train_labels)
+    isKaggle = False
+    test_dataset, train_dataset, test_inst_id_not_enc = prepare_data(test_dataset, train, train_labels, isKaggle)
 
-    # x_train, x_test, y_train, y_test, test_ist_ids = prepare_train_and_test(train_dataset)
+    #if isKaggle df["accuracy_group"] = NaN
+    if isKaggle:
+        test_dataset.drop("accuracy_group", inplace=True, axis=1)
 
-    # model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test)
-    # prediction = model.predict()
-    # write_submission(test_ist_ids["installation_id"].tolist(), prediction, "submission.csv")
-
-    #print(quadratic_kappa(y_test, prediction, 4))
-    
-    x_train, x_test_hash, y_train, test_dataset_ids = prepare_hash_train_and_test_kaggle(train_dataset, test_dataset)
+    x_train, x_test_hash, y_train = prepare_hash_train_and_test_kaggle(train_dataset, test_dataset)
+    if not isKaggle:
+        real_value = x_test_hash["accuracy_group"]
+        x_test_hash = x_test_hash.drop("accuracy_group", axis=1)
 
     model = ModelMaker(KNeighborsClassifier, hyperparams, x_train, y_train, x_test_hash)
     prediction = model.predict()
-    write_submission(test_dataset_ids.tolist(), prediction, "submission.csv")
+    write_submission(test_inst_id_not_enc, prediction, "submission.csv")
 
-    return prediction
+    if not isKaggle:
+        print(quadratic_kappa(real_value, prediction, 4))
+    return 1
 
 
 if __name__ == "__main__":

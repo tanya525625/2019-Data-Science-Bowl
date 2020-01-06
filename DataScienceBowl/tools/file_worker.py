@@ -15,7 +15,7 @@ class FileWorker:
         :return: pd.DataFrame, which was read
         """
 
-        return getattr(pd, f"read_{extension}")(input_path, nrows=220000)
+        return getattr(pd, f"read_{extension}")(input_path, nrows=10000)
 
     @staticmethod
     def write_df(df: pd.DataFrame, output_path: str, extension="csv"):
@@ -75,14 +75,14 @@ def read_data(files, input_path):
 
 
 def write_submission(inst_ids: list, prediction: list, path_to_file: str):
-    max_ln = len(format(max(inst_ids), 'x'))
-    
-    for i in range(len(inst_ids)):
-        cur_id = format(inst_ids[i], 'x')
-        if(len(cur_id) < max_ln):
-            inst_ids[i] = '0'*(max_ln-len(cur_id)) + cur_id
-        else:
-            inst_ids[i] = cur_id
+    # max_ln = len(format(max(inst_ids), 'x'))
+    #
+    # for i in range(len(inst_ids)):
+    #     cur_id = format(inst_ids[i], 'x')
+    #     if(len(cur_id) < max_ln):
+    #         inst_ids[i] = '0'*(max_ln-len(cur_id)) + cur_id
+    #     else:
+    #         inst_ids[i] = cur_id
 
     df = pd.DataFrame(list(zip(inst_ids, prediction)), 
                       columns=['installation_id', 'accuracy_group'])
