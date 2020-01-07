@@ -75,8 +75,9 @@ def process_data(train, test):
     y_train = new_train['accuracy_group']
     # remove accuracy_group from the test data
     X_test = new_test[features]
-    
-    return X_train, y_train, X_test
+    y_test = new_test['accuracy_group']
+    return X_train, y_train, X_test, y_test
+
 
 def make_hashes(all_activities):
     # create a dictionary numerating the titles
