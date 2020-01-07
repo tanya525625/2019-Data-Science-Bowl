@@ -29,7 +29,7 @@ from tools.file_worker import read_data
 
 if __name__ == "__main__":
 #read data
-    input_path = '/kaggle/input/data-science-bowl-2019'
+    input_path = os.path.join('kaggle', 'input', 'data-science-bowl-2019')
     files = ["train.csv", "train_labels.csv", "test.csv", "sample_submission.csv"]
 
     data = read_data(files, input_path)
