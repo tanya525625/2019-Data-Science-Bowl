@@ -1,5 +1,6 @@
-import pandas as pd
 import os
+
+import pandas as pd
 
 
 class FileWorker:
@@ -15,7 +16,7 @@ class FileWorker:
         :return: pd.DataFrame, which was read
         """
 
-        return getattr(pd, f"read_{extension}")(input_path, nrows=10000)
+        return getattr(pd, f"read_{extension}")(input_path)
 
     @staticmethod
     def write_df(df: pd.DataFrame, output_path: str, extension="csv"):
@@ -28,7 +29,7 @@ class FileWorker:
         """
 
         if check_format_support(output_path):
-            getattr(df, f"to_{extension}")(output_path)
+            getattr(df, f"to_{extension}")(output_path, index=False)
 
 
 def check_format_support(path):
@@ -73,9 +74,8 @@ def read_data(files, input_path):
         data_dict.update({file: df})
     return data_dict
 
-
 def write_submission(inst_ids: list, prediction: list, path_to_file: str):
-    df = pd.DataFrame(prediction, index=inst_ids)
-    df.columns = ["accuracy_group"]
+    df = pd.DataFrame(list(zip(inst_ids, prediction)), 
+                      columns=['installation_id', 'accuracy_group'])
     fw = FileWorker()
     fw.write_df(df, path_to_file)

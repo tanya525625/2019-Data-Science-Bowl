@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 from sklearn.metrics import confusion_matrix
 
@@ -48,33 +47,3 @@ def quadratic_kappa(actuals, preds, N=4):
         return 1
     else:
         return (1 - (num / den)) / 2 + 0.5
-
-
-def list_of_class_values_from_file(file_path):
-    """
-    This function extracts a list of group values from csv file with columns
-    installation_id and accuracy_group
-
-    :param file_path: path to the file
-    :return: list of sorted by installation_id group values
-    """
-
-    df = pd.read_csv(file_path)
-
-    df.sort_values(by="installation_id")
-
-    return df["accuracy_group"].values.tolist()
-
-
-def list_of_class_values_from_df(df):
-    """
-    This function extracts a list of group values from dataframe with columns
-    installation_id and accuracy_group
-
-    :param df: input dataframe
-    :return: list of sorted by installation_id group values
-    """
-
-    df.sort_values(by="installation_id")
-
-    return df["accuracy_group"].values.tolist()
