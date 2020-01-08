@@ -3,23 +3,12 @@ import os
 from tools.file_worker import read_data
 from tools.quadratic_metric_kappa import quadratic_kappa
 
-
 from sklearn.ensemble import GradientBoostingClassifier
 from tools.data_preprocessing import prepare_train_dataset_due_to_train_labels
 from tools.data_preprocessing import prepare_train_dataset_and_test
-from tools.data_preprocessing import find_unique_values
 from tools.data_preprocessing import process_data
-from tools.data_preprocessing import make_hashes
-from tools.data_preprocessing import encode_data
-from tools.data_preprocessing import make_win_codes
-from tools.data_preprocessing import process_assessments
 from tools.model_maker import ModelMaker
 
-from sklearn.neighbors import KNeighborsClassifier
-import pandas
-import numpy
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import chi2
 import json
 import gc
 
