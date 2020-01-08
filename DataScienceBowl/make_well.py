@@ -167,16 +167,16 @@ def get_hyperparams_range():
     '''
     Method to return sample hyperparams_range
     '''
-    valid_keys = ["loss", "learning_rate", ]
+    valid_keys = ["loss", "learning_rate", "n_estimators", "subsample",
+                  "random_state", "max_features"]
     return {
         "model_type": [[GradientBoostingClassifier, valid_keys], ],
-        "learning_rate": [0.1, 1, 100],
+        "learning_rate": [0.1, 1.2, 0.2],
         "loss": ['deviance', 'exponential'],
-        "n_estimators": [100, 300, 1000],
-        "subsample": [0.2, 1.2, 100],
+        "n_estimators": [100, 300, 50],
+        "subsample": [0.2, 1.2, 0.2],
         "random_state": [None, 123],
-        "max_features": ["None", "log2", "sqrt"],
-        "ccp_alpha": [0.0, 1, 100]
+        "max_features": ["None", "log2", "sqrt"]
     }
 
 
