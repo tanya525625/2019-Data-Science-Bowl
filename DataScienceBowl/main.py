@@ -8,6 +8,7 @@ from tools.data_preprocessing import process_data
 from tools.model_maker import ModelMaker
 from tools.file_worker import write_submission
 from tools.file_worker import read_data
+from tools.data_preprocessing import split_train_and_test
 
 
 if __name__ == "__main__":
@@ -29,7 +30,10 @@ if __name__ == "__main__":
     train, test = prepare_train_dataset_and_test(train, test)
     train = prepare_train_dataset_due_to_train_labels(train, train_labels)
 
-    X_train, y_train, X_test = process_data(train, test)
+    if not isKaggle:
+        X_train, X_test, y_train, y_test = split_train_and_test(train)
+    else:
+        X_train, y_train, X_test = process_data(train, test)
 
     # set hyperparams
     GBC_hyperparams = {
@@ -37,7 +41,11 @@ if __name__ == "__main__":
         'n_estimators': 100
     }
 
+    print(X_train)
+    print(y_test)
     # make prediction
     model = ModelMaker(GradientBoostingClassifier, GBC_hyperparams, X_train, y_train, X_test)
     prediction = model.predict()
+    if not isKaggle:
+        
     write_submission(sample_submission['installation_id'].tolist(), prediction, "submission.csv")

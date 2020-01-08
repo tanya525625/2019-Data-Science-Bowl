@@ -3,12 +3,15 @@ import numpy as np
 
 from collections import Counter
 
+from sklearn.model_selection import train_test_split
+
 
 def prepare_train_dataset_due_to_train_labels(train, train_labels):
     # filter the train dataset for values whose installation_id appears in train_labels
     train = train[train['installation_id'].isin(list(train_labels['installation_id'].unique()))]
 
     return train
+
 
 def prepare_train_dataset_and_test(train, test):
     # dropping data that didn't have an assesment
@@ -20,6 +23,7 @@ def prepare_train_dataset_and_test(train, test):
     test['timestamp'] = pd.to_datetime(test['timestamp'])
     
     return train, test
+
 
 def find_unique_values(train, test):
     # make a list with all the unique 'titles' from the train and test set
@@ -35,6 +39,7 @@ def find_unique_values(train, test):
     all_event_codes = list(event_codes_in_train.union(event_codes_in_test))
     
     return all_activities, all_event_codes
+
 
 def process_data(train, test):
     # list of unique values from 'title' and 'event_code'
@@ -86,12 +91,14 @@ def make_hashes(all_activities):
     
     return activities_codes, activities_names
 
+
 def encode_data(train, test, activities_values):
     # replace the text titles withing the number titles from the dict
     train['title'] = train['title'].map(activities_values)
     test['title'] = test['title'].map(activities_values)
     
     return train, test
+
 
 def make_win_codes(activities_hashes):
     # this one makes a dict where the value of each element is 4100 
@@ -101,6 +108,7 @@ def make_win_codes(activities_hashes):
     win_codes[activities_hashes['Bird Measurer (Assessment)']] = 4110
     
     return win_codes
+
 
 # this is the function that convert the raw data into processed features
 def process_assessments(user_sample, all_activities, all_event_codes, activities_names, win_codes, test_set=False):
@@ -232,4 +240,22 @@ def process_assessments(user_sample, all_activities, all_event_codes, activities
     # in the train_set, all assessments goes to the dataset
 
     return all_assessments
+
+
+def split_train_and_test(dataset):
+    """
+    Function for splitting dataset
+    to train and test datasets
+
+    :param dataset: dataset for splitting
+    :return: train and test datasets
+    """
+
+    y = dataset['accuracy_group']
+    X = dataset.drop('accuracy_group', axis=1)
+    y.columns = ['accuracy_group']
+    x_train, x_test, y_train, y_test = \
+        train_test_split(X, y, test_size=0.33, random_state=42)
+
+    return x_train, x_test, y_train, y_test
 
