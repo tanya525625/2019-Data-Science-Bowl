@@ -119,6 +119,7 @@ def process_assessments(user_sample, all_activities, all_event_codes, activities
     The test_set parameter is related with the labels processing,
     that is only requered if test_set=False
     '''
+
     # Constants and parameters declaration
     last_activity = 0
     user_activities_count = {'Clip':0, 'Activity': 0, 'Assessment': 0, 'Game':0}
