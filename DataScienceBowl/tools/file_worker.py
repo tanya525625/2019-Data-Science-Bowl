@@ -16,7 +16,7 @@ class FileWorker:
         :return: pd.DataFrame, which was read
         """
 
-        return getattr(pd, f"read_{extension}")(input_path, nrows=10000)
+        return getattr(pd, f"read_{extension}")(input_path)
 
     @staticmethod
     def write_df(df: pd.DataFrame, output_path: str, extension="csv"):
@@ -84,7 +84,8 @@ def write_submission(inst_ids: list, prediction: list, path_to_file: str):
     :param path_to_file: output path
     """
 
-    df = pd.DataFrame(list(zip(inst_ids, prediction)), 
-                      columns=['installation_id', 'accuracy_group'])
+    df = pd.DataFrame(
+        list(zip(inst_ids, prediction)), columns=["installation_id", "accuracy_group"]
+    )
     fw = FileWorker()
     fw.write_df(df, path_to_file)

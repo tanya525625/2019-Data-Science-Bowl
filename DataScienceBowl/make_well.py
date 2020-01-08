@@ -13,8 +13,7 @@ import json
 import gc
 
 
-def find_well_hyperparams(data_path: str, data_files: list,
-                          hyperparams_range: dict):
+def find_well_hyperparams(data_path: str, data_files: list, hyperparams_range: dict):
     """
     Method for finding optimal hyperparameters
     within given hyperparameters range.
@@ -45,63 +44,69 @@ def _prepare_dataset(data_path, data_files):
     train = prepare_train_dataset_due_to_train_labels(train, train_labels)
 
     X_train, y_train, X_test, y_test = process_data(train, test)
-    dataset = {'x_train': X_train, 'y_train': y_train,
-               'x_test': X_test, 'y_test': y_test}
+    dataset = {
+        "x_train": X_train,
+        "y_train": y_train,
+        "x_test": X_test,
+        "y_test": y_test,
+    }
     return dataset
 
 
 def _transform_range_to_set(hyperparams_range):
-    '''
+    """
     Method transforms range (min, max, step) to sets
     (min, min + step, ...)
         :param hyperparams_range: dict that describes ranges
                                 and sets of params to be tried
         :return: dict with sets of value of hyperparams
-    '''
-    ranges = {key: hyperparams_range[key]
-              for key in hyperparams_range
-              if type(hyperparams_range[key][0]) is int}
+    """
+    ranges = {
+        key: hyperparams_range[key]
+        for key in hyperparams_range
+        if type(hyperparams_range[key][0]) is int
+    }
     hyperparams_sets = {key: [] for key in ranges}
     for key in ranges:
         for val in range(ranges[key][0], ranges[key][1], ranges[key][2]):
             hyperparams_sets[key].append(val)
-    hyperparams_sets.update({key: hyperparams_range[key]
-                             for key in hyperparams_range
-                             if key not in ranges})
+    hyperparams_sets.update(
+        {key: hyperparams_range[key] for key in hyperparams_range if key not in ranges}
+    )
     return hyperparams_sets
 
 
 def _get_min_from_range(hyperparams_range):
-    '''
+    """
     Method get initial values of hyperparams from it's ranges.
         :return: dict-hyperparams
-    '''
+    """
     return {key: hyperparams_range[key][0] for key in hyperparams_range}
 
 
 def _find_best_params(dataset, hyperparams, hyperparams_sets):
-    '''
+    """
     Method to try all variants of hyperparams using it's range and choose
     the best params (by quadratic_kappa evaluation)
         :param dataset: dataset for model training and testing
         :param hyperparams: current hyperparams
         :param hyperparams_sets: dict, sets of hyperparams value
         :return: dict with sets of value of hyperparams
-    '''
-    n = len(hyperparams_sets['model_type'])
-    result = {'value': 0, 'hyperparams': None}
+    """
+    n = len(hyperparams_sets["model_type"])
+    result = {"value": 0, "hyperparams": None}
     for i in range(n):
-        hyperparams['model_type'] = hyperparams_sets['model_type'][i]
-        valid_keys = hyperparams['model_type'][1]
+        hyperparams["model_type"] = hyperparams_sets["model_type"][i]
+        valid_keys = hyperparams["model_type"][1]
         sets = {key: hyperparams_sets[key] for key in valid_keys}
-        _recursive_finding(dataset, hyperparams, hyperparams_sets,
-                           valid_keys, result, 0)
+        _recursive_finding(
+            dataset, hyperparams, hyperparams_sets, valid_keys, result, 0
+        )
     return result
 
 
-def _recursive_finding(dataset, hyperparams, hyperparams_sets,
-                       keys, result, index):
-    '''
+def _recursive_finding(dataset, hyperparams, hyperparams_sets, keys, result, index):
+    """
     Method to try all variants of hyperparams using it's range and choose
     the best params (by quadratic_kappa evaluation) in within one model type
         :param dataset: dataset for model training and testing
@@ -111,74 +116,77 @@ def _recursive_finding(dataset, hyperparams, hyperparams_sets,
         :param result dict to storing the best hyperparams and their score
         :param index: current index
         :return: dict with sets of value of hyperparams
-    '''
-    if (index >= len(keys)):
+    """
+    if index >= len(keys):
         value = _try_params(hyperparams, dataset)
-        if (value > result['value']):
-            result['value'] = value
-            result['hyperparams'] = hyperparams.copy()
+        if value > result["value"]:
+            result["value"] = value
+            result["hyperparams"] = hyperparams.copy()
             print(value)
-            del well_params['hyperparams']['model_type'][0]
+            del well_params["hyperparams"]["model_type"][0]
             str = json.dumps(well_params)
-            with open("well_params.json", 'wt') as f:
+            with open("well_params.json", "wt") as f:
                 f.write(str)
         return
     key = keys[index]
     n = len(hyperparams_sets[key])
     for i in range(n):
         hyperparams[key] = hyperparams_sets[key][i]
-        _recursive_finding(dataset, hyperparams, hyperparams_sets, keys,
-                           result, index + 1)
+        _recursive_finding(
+            dataset, hyperparams, hyperparams_sets, keys, result, index + 1
+        )
 
 
 def _try_params(hyperparams, dataset):
-    '''
+    """
     Method to make model by given hyperparams and evaluate it by
     quadratic_kappa
         :param hyperparams: current hyperparams
         :param dataset: dataset for model training and testing
         :return: score of hyperparams evaluated by quadratic_kappa
-    '''
+    """
     params = hyperparams.copy()
-    del params['model_type']
-    model = ModelMaker(hyperparams['model_type'][0], params,
-                       dataset['x_train'],
-                       dataset['y_train'],
-                       dataset['x_test'])
+    del params["model_type"]
+    model = ModelMaker(
+        hyperparams["model_type"][0],
+        params,
+        dataset["x_train"],
+        dataset["y_train"],
+        dataset["x_test"],
+    )
     prediction = model.predict()
     del model
     del params
     gc.collect()
-    return quadratic_kappa(dataset['y_test'], prediction, 4)
+    return quadratic_kappa(dataset["y_test"], prediction, 4)
 
 
 def get_hyperparams_range():
-    '''
+    """
     Method to return sample hyperparams_range
-    '''
-    valid_keys = ["loss", "learning_rate", ]
+    """
+    valid_keys = ["loss", "learning_rate"]
     return {
-        "model_type": [[GradientBoostingClassifier, valid_keys], ],
+        "model_type": [[GradientBoostingClassifier, valid_keys]],
         "learning_rate": [0.1, 1, 100],
-        "loss": ['deviance', 'exponential'],
+        "loss": ["deviance", "exponential"],
         "n_estimators": [100, 300, 1000],
         "subsample": [0.2, 1.2, 100],
         "random_state": [None, 123],
         "max_features": ["None", "log2", "sqrt"],
-        "ccp_alpha": [0.0, 1, 100]
+        "ccp_alpha": [0.0, 1, 100],
     }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     input_path = "../Data"
     output_path = os.path.join("..", "Prediction")
-    files = ["train.csv", "train_labels.csv", "test.csv",
-             "sample_submission.csv"]
+    files = ["train.csv", "train_labels.csv", "test.csv", "sample_submission.csv"]
     hyperparams_ranges = get_hyperparams_range()
     well_params = find_well_hyperparams(input_path, files, hyperparams_ranges)
-    print(well_params['hyperparams'])
-    print(well_params['value'])
-    del well_params['hyperparams']['model_type'][0]
+    print(well_params["hyperparams"])
+    print(well_params["value"])
+    del well_params["hyperparams"]["model_type"][0]
     str = json.dumps(well_params)
-    with open("well_params.json", 'wt') as f:
+    with open("well_params.json", "wt") as f:
         f.write(str)
