@@ -46,4 +46,4 @@ def quadratic_kappa(actuals, preds, N=4):
     if den == 0:
         return 1
     else:
-        return (1 - (num / den)) / 2 + 0.5
+        return (1 - (num / den))
